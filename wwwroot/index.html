@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PayrollApp — Gestion des salaires</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="hero">
+    <h1>PayrollApp</h1>
+    <p>Gestion simple des salaires — thème vert & blanc</p>
+  </header>
+  <main class="container">
+    <section class="panel">
+      <h2>Employés</h2>
+      <div class="form-row">
+        <input id="first" placeholder="Prénom">
+        <input id="last" placeholder="Nom">
+        <input id="position" placeholder="Poste">
+      </div>
+      <div class="form-row">
+        <input id="base" placeholder="Salaire de base">
+        <input id="allow" placeholder="Allocations">
+        <input id="deduct" placeholder="Déductions">
+      </div>
+      <button id="addBtn">Ajouter l'employé</button>
+      <hr>
+      <ul id="employeesList" class="list"></ul>
+    </section>
+
+    <section class="panel">
+      <h2>Calculer Paie</h2>
+      <select id="empSelect"></select>
+      <input id="period" placeholder="Période (YYYY-MM)" value="">
+      <input id="tax" placeholder="Taux d'impôt (ex: 0.10)">
+      <button id="calcBtn">Calculer et Enregistrer</button>
+      <hr>
+      <h3>Dernières fiches</h3>
+      <ul id="payrollsList" class="list"></ul>
+    </section>
+  </main>
+
+  <footer class="foot">Simple & léger — prêt pour Render</footer>
+  <script src="/app.js"></script>
+</body>
+</html>

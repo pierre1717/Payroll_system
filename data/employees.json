@@ -1,0 +1,12 @@
+[
+  {
+    "Id": "00000000-0000-0000-0000-000000000001",
+    "FirstName": "Pierre",
+    "LastName": "Ndione",
+    "Position": "Admin R\u00e9seau",
+    "BaseSalary": 500000,
+    "Allowances": 50000,
+    "Deductions": 0,
+    "TaxRate": 0.1
+  }
+]
