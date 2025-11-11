@@ -1,90 +1,51 @@
-
-namespace PayrollApp.Services;
-
 using System.Text.Json;
+using System.Collections.Generic;
 
 public class JsonStorage
 {
-    private readonly string _folder;
-    private readonly object _lock = new();
-    private readonly JsonSerializerOptions _opts = new() { WriteIndented = true };
+    private readonly string employeeFile = "data/employees.json";
+    private readonly string payrollFile = "data/payrolls.json";
 
-    public JsonStorage(string folder)
+    public JsonStorage()
     {
-        _folder = folder;
+        Directory.CreateDirectory("data");
+
+        if (!File.Exists(employeeFile))
+            File.WriteAllText(employeeFile, "[]");
+
+        if (!File.Exists(payrollFile))
+            File.WriteAllText(payrollFile, "[]");
     }
 
-    private string PathFor(string file) => System.IO.Path.Combine(_folder, file);
+    // ==================== EMPLOYEES ====================
 
-    public List<T> GetAll<T>(string file)
+    public List<Employee> GetEmployees()
     {
-        lock (_lock)
-        {
-            var p = PathFor(file);
-            if (!File.Exists(p)) return new List<T>();
-            var txt = File.ReadAllText(p);
-            return JsonSerializer.Deserialize<List<T>>(txt) ?? new List<T>();
-        }
+        var json = File.ReadAllText(employeeFile);
+        return JsonSerializer.Deserialize<List<Employee>>(json) ?? new List<Employee>();
     }
 
-    public T? Find<T>(string file, Guid id) where T : class
+    public void AddEmployee(Employee emp)
     {
-        var list = GetAll<T>(file);
-        return list.FirstOrDefault(item =>
-        {
-            var prop = item!.GetType().GetProperty("Id");
-            if (prop is null) return false;
-            var val = prop.GetValue(item);
-            return val is Guid g && g == id;
-        });
+        var list = GetEmployees();
+        emp.Id = list.Count > 0 ? list.Max(e => e.Id) + 1 : 1;
+        list.Add(emp);
+        File.WriteAllText(employeeFile, JsonSerializer.Serialize(list, new JsonSerializerOptions { WriteIndented = true }));
     }
 
-    public void Add<T>(string file, T item)
+    // ==================== PAYROLLS ====================
+
+    public List<Payroll> GetPayrolls()
     {
-        lock (_lock)
-        {
-            var list = GetAll<T>(file);
-            list.Add(item);
-            File.WriteAllText(PathFor(file), JsonSerializer.Serialize(list, _opts));
-        }
+        var json = File.ReadAllText(payrollFile);
+        return JsonSerializer.Deserialize<List<Payroll>>(json) ?? new List<Payroll>();
     }
 
-    public bool Update<T>(string file, Guid id, T newItem)
+    public void AddPayroll(Payroll pay)
     {
-        lock (_lock)
-        {
-            var list = GetAll<T>(file);
-            var ix = list.FindIndex(item =>
-            {
-                var prop = item!.GetType().GetProperty("Id");
-                if (prop is null) return false;
-                var val = prop.GetValue(item);
-                return val is Guid g && g == id;
-            });
-            if (ix == -1) return false;
-            var propNew = newItem!.GetType().GetProperty("Id");
-            if (propNew is not null) propNew.SetValue(newItem, id);
-            list[ix] = newItem;
-            File.WriteAllText(PathFor(file), JsonSerializer.Serialize(list, _opts));
-            return true;
-        }
-    }
-
-    public bool Delete<T>(string file, Guid id)
-    {
-        lock (_lock)
-        {
-            var list = GetAll<T>(file);
-            var newList = list.Where(item =>
-            {
-                var prop = item!.GetType().GetProperty("Id");
-                if (prop is null) return true;
-                var val = prop.GetValue(item);
-                return !(val is Guid g && g == id);
-            }).ToList();
-            if (newList.Count == list.Count) return false;
-            File.WriteAllText(PathFor(file), JsonSerializer.Serialize(newList, _opts));
-            return true;
-        }
+        var list = GetPayrolls();
+        pay.Id = list.Count > 0 ? list.Max(p => p.Id) + 1 : 1;
+        list.Add(pay);
+        File.WriteAllText(payrollFile, JsonSerializer.Serialize(list, new JsonSerializerOptions { WriteIndented = true }));
     }
 }
